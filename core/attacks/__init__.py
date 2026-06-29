@@ -8,10 +8,10 @@ from .Blind import Blind
 from .IAD import IAD
 from .LIRA import LIRA
 from .PhysicalBA import PhysicalBA
-from .TUAP import TUAP
+
 from .SleeperAgent import SleeperAgent
 from .AdaptivePatch import AdaptivePatch
 
 __all__ = [
-    'BadNets', 'Blended','Refool', 'WaNet', 'LabelConsistent', 'Blind', 'IAD', 'LIRA', 'PhysicalBA','TUAP', 'SleeperAgent', 'AdaptivePatch',
+    'BadNets', 'Blended','Refool', 'WaNet', 'LabelConsistent', 'Blind', 'IAD', 'LIRA', 'PhysicalBA', 'SleeperAgent', 'AdaptivePatch',
 ]
