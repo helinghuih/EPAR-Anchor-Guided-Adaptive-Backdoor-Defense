@@ -10,11 +10,6 @@ import copy
 import random
 from ..utils.accuracy import accuracy
 
-
-# =========================================================
-#  Part 0: Core Math (DDN & FFT & PGD & SCE)
-# =========================================================
-
 class SCELoss(torch.nn.Module):
     def __init__(self, num_classes, alpha=0.1, beta=1.0, reduction='mean'):
         super(SCELoss, self).__init__()
@@ -131,7 +126,6 @@ def _process_batch(model, batch_images, batch_labels, device, ddn_steps, sce_los
         batch_results.append({
             'freq_diff_pre_post_energy': post_attack_high_freq_energy - pre_attack_high_freq_energy,
             'pre_attack_sce': pre_attack_sce,
-            # [新增] 返回 Pre 和 Post 的 HFE 值
             'pre_attack_hfe': pre_attack_high_freq_energy,
             'post_attack_hfe': post_attack_high_freq_energy,
         })
@@ -183,10 +177,6 @@ def pgd_attack_steps_batch(model, images, labels, device='cuda', eps=8 / 255, al
     return step_counts.cpu().tolist()
 
 
-# =========================================================
-#  Part 1: Datasets (Helper)
-# =========================================================
-
 class CleanSubsetDataset(Dataset):
     def __init__(self, samples_indices, original_dataset, transform=None):
         self.original_dataset = original_dataset
@@ -219,10 +209,6 @@ class MatchSampleDataset(Dataset):
         image, label = self.original_dataset[idx]
         return image, label, idx
 
-
-# =========================================================
-#  Part 2: Training & Eval Helpers
-# =========================================================
 
 def train_cft_model(model_init, dataset, p_test, clean_test, schedule, log, device='cuda'):
     """
@@ -308,16 +294,7 @@ def _quick_eval(model, dataset, device, batch_size):
     prec1, prec5 = accuracy(outputs, labels, topk=(1, 5))
     return prec1.item(), prec5.item()
 
-
-# =========================================================
-#  Part 3: Few-Shot Guided SCE Helpers (Modified)
-# =========================================================
-
 def get_few_shot_clean_subset(dataset, num_classes, shots, seed=666):
-    """
-    从训练集中选取 'shots' 个样本/类。
-    [关键修改]: 强制检查 dataset.poisoned_set，排除任何中毒样本。
-    """
     print(f"Selecting {shots} CLEAN samples per class (Total classes: {num_classes})...")
 
     class_indices = {i: [] for i in range(num_classes)}
@@ -328,14 +305,11 @@ def get_few_shot_clean_subset(dataset, num_classes, shots, seed=666):
     random.shuffle(all_indices)
 
     finished_classes = 0
-
-    # 获取中毒样本索引集合 (如果存在)
     poisoned_indices = set()
     if hasattr(dataset, 'poisoned_set') and dataset.poisoned_set is not None:
         poisoned_indices = dataset.poisoned_set
         print(f"  [Info] Found poisoned_set with {len(poisoned_indices)} indices. These will be skipped.")
 
-    # 标签提取
     all_labels = None
     if hasattr(dataset, 'targets'):
         all_labels = dataset.targets
@@ -346,7 +320,6 @@ def get_few_shot_clean_subset(dataset, num_classes, shots, seed=666):
 
     if all_labels is not None:
         for idx in all_indices:
-            # ✅ [Check] 如果是中毒样本，直接跳过
             if idx in poisoned_indices:
                 continue
 
@@ -364,7 +337,6 @@ def get_few_shot_clean_subset(dataset, num_classes, shots, seed=666):
     else:
         print("[Warning] Dataset labels not found directly. Iterating (slow)...")
         for idx in all_indices:
-            # ✅ [Check]
             if idx in poisoned_indices:
                 continue
 
@@ -386,18 +358,12 @@ def get_few_shot_clean_subset(dataset, num_classes, shots, seed=666):
 
 
 def get_clean_samples_of_target(dataset, target_class, count=30):
-    """
-    [新函数] 专门用于 Step 2：从训练集中筛选出指定类别的【绝对干净】样本。
-    """
     print(f"Searching for {count} CLEAN samples of class {target_class}...")
     clean_indices = []
-
-    # 获取中毒集合
     poisoned_indices = set()
     if hasattr(dataset, 'poisoned_set') and dataset.poisoned_set is not None:
         poisoned_indices = dataset.poisoned_set
 
-    # 标签提取
     all_labels = None
     if hasattr(dataset, 'targets'):
         all_labels = dataset.targets
@@ -405,15 +371,11 @@ def get_clean_samples_of_target(dataset, target_class, count=30):
         all_labels = dataset.labels
     elif hasattr(dataset, '_samples'):
         all_labels = [x[1] for x in dataset._samples]
-
-    # 遍历寻找
     indices = list(range(len(dataset)))
-    random.shuffle(indices)  # 随机找
+    random.shuffle(indices)
 
     for idx in indices:
-        if idx in poisoned_indices: continue  # 跳过毒
-
-        # 获取标签
+        if idx in poisoned_indices: continue
         if all_labels:
             label = int(all_labels[idx])
         else:
@@ -430,9 +392,6 @@ def get_clean_samples_of_target(dataset, target_class, count=30):
 
 
 def train_guided_model(model, subset, device='cuda', epochs=20):
-    """
-    Fine-tunes the model on the small clean subset.
-    """
     loader = DataLoader(subset, batch_size=32, shuffle=True, num_workers=4)
     optimizer = optim.SGD(model.parameters(), lr=0.05, momentum=0.9, weight_decay=5e-4)
     criterion = nn.CrossEntropyLoss()
@@ -454,24 +413,17 @@ def train_guided_model(model, subset, device='cuda', epochs=20):
 
 def calculate_guided_sce_values(dataset, model_factory, num_classes, shots, device='cuda', batch_size=128,
                                 num_workers=4):
-    """
-    Calculates SCE values using a model trained on a few-shot clean subset.
-    [Modification]: Removed target_class argument.
-    """
-    # 1. Init Model
+
     model = model_factory()
 
-    # 2. Get Few-Shot Clean Subset (Blind selection)
     clean_subset = get_few_shot_clean_subset(
         dataset,
         num_classes=num_classes,
         shots=shots
     )
 
-    # 3. Train Guided Model
     model = train_guided_model(model, clean_subset, device=device, epochs=20)
 
-    # 4. Calculate SCE
     model.eval()
     criterion = SCELoss(num_classes=num_classes, reduction='none')
     loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
