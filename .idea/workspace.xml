@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_INJECTED_CODE" value="false" />
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="14ea678d-693f-4660-82c0-baa30bcbeee7" name="更改" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/BackdoorBox-main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/ASD.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/assets/pipeline_cvpr.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/config/baseline_asd.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/model/loss.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/model/model.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/model/network/resnet_cifar.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/model/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/requirements.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/storage/baseline_asd/checkpoint/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/utils/setup.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/utils/trainer/log.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/utils/trainer/semi.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ASD-main/utils/trainer/utils.py" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform)); sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo, NoAppException&#10;for module in [&quot;main.py&quot;, &quot;wsgi.py&quot;, &quot;app.py&quot;]:&#10;    try: locals().update(ScriptInfo(app_import_path=module, create_app=None).load_app().make_shell_context()); print(&quot;\nFlask App: %s&quot; % app.import_name); break&#10;    except NoAppException: pass">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform)); sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo, NoAppException&#10;for module in [&quot;main.py&quot;, &quot;wsgi.py&quot;, &quot;app.py&quot;]:&#10;    try: locals().update(ScriptInfo(app_import_path=module, create_app=None).load_app().make_shell_context()); print(&quot;\nFlask App: %s&quot; % app.import_name); break&#10;    except NoAppException: pass" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2yJE79qUic3S1CVJiiJesBmGBFl" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.1.executor&quot;: &quot;Run&quot;,
+    &quot;Python.2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.classify_samples.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ddf.executor&quot;: &quot;Run&quot;,
+    &quot;Python.pgd_evaluation.executor&quot;: &quot;Run&quot;,
+    &quot;Python.plot_combined_curve.executor&quot;: &quot;Run&quot;,
+    &quot;Python.plot_sce_curves.executor&quot;: &quot;Run&quot;,
+    &quot;Python.process_blended_results.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run_epar_defense.executor&quot;: &quot;Run&quot;,
+    &quot;Python.sort_poisoned_results.executor&quot;: &quot;Run&quot;,
+    &quot;Python.trans.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/123/Desktop/BackdoorBox-main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;aDefault&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\123\Desktop\BackdoorBox-main" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\123\Desktop\BackdoorBox-main" />
+      <recent name="C:\Users\123\Desktop\BackdoorBox-main\core" />
+      <recent name="C:\Users\123\Desktop\BackdoorBox-main\results" />
+      <recent name="C:\Users\123\Desktop\BackdoorBox-main\experiments" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.3">
+    <configuration name="3" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BackdoorBox-main" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/3.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="baolu" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BackdoorBox-main" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="C:\Users\123\Desktop\BackdoorBox-main\baolu.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="classify_samples" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BackdoorBox-main" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/classify_samples.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="plot_combined_curve" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BackdoorBox-main" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/plot_combined_curve.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="run_epar_defense" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BackdoorBox-main" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="DEBUG_JUST_MY_CODE" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="RUN_TOOL" value="" />
+      <option name="SCRIPT_NAME" value="C:\Users\123\Desktop\BackdoorBox-main\run_epar_defense.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.3" />
+        <item itemvalue="Python.run_epar_defense" />
+        <item itemvalue="Python.baolu" />
+        <item itemvalue="Python.classify_samples" />
+        <item itemvalue="Python.plot_combined_curve" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-PY-261.24374.152" />
+        <option value="bundled-python-sdk-c59985aa861c-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.24374.152" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="14ea678d-693f-4660-82c0-baa30bcbeee7" name="更改" comment="" />
+      <created>1733663479248</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1733663479248</updated>
+      <workItem from="1733663486080" duration="503000" />
+      <workItem from="1749544108302" duration="18864000" />
+      <workItem from="1749630529984" duration="389000" />
+      <workItem from="1749631293461" duration="18370000" />
+      <workItem from="1749806344422" duration="653000" />
+      <workItem from="1749971065662" duration="5615000" />
+      <workItem from="1750044238682" duration="14230000" />
+      <workItem from="1750147962060" duration="736000" />
+      <workItem from="1750246957039" duration="7933000" />
+      <workItem from="1750550729562" duration="20250000" />
+      <workItem from="1750839056662" duration="7433000" />
+      <workItem from="1750903805279" duration="8139000" />
+      <workItem from="1750926671217" duration="690000" />
+      <workItem from="1750927480255" duration="15968000" />
+      <workItem from="1751243766548" duration="1192000" />
+      <workItem from="1751333767391" duration="5458000" />
+      <workItem from="1751424931377" duration="3515000" />
+      <workItem from="1751447916606" duration="609000" />
+      <workItem from="1751504417324" duration="12968000" />
+      <workItem from="1752368877605" duration="31952000" />
+      <workItem from="1752832032905" duration="8774000" />
+      <workItem from="1753170097534" duration="28631000" />
+      <workItem from="1753841541058" duration="6029000" />
+      <workItem from="1753922617733" duration="16430000" />
+      <workItem from="1755484722761" duration="34370000" />
+      <workItem from="1756731281581" duration="18903000" />
+      <workItem from="1756971017656" duration="1021000" />
+      <workItem from="1757034516191" duration="35322000" />
+      <workItem from="1757378787945" duration="15703000" />
+      <workItem from="1757575463786" duration="55226000" />
+      <workItem from="1758165461011" duration="60122000" />
+      <workItem from="1759107776493" duration="9416000" />
+      <workItem from="1760011005439" duration="7574000" />
+      <workItem from="1760149975417" duration="7153000" />
+      <workItem from="1760317408763" duration="2046000" />
+      <workItem from="1760322869899" duration="62634000" />
+      <workItem from="1760671708596" duration="15258000" />
+      <workItem from="1760833935171" duration="100236000" />
+      <workItem from="1761611779471" duration="69002000" />
+      <workItem from="1762075727461" duration="73739000" />
+      <workItem from="1762476031999" duration="190957000" />
+      <workItem from="1763973957413" duration="82562000" />
+      <workItem from="1765069504012" duration="4198000" />
+      <workItem from="1765077541046" duration="230000" />
+      <workItem from="1765093343497" duration="6384000" />
+      <workItem from="1765180306922" duration="7878000" />
+      <workItem from="1765414827341" duration="29301000" />
+      <workItem from="1766450315620" duration="35095000" />
+      <workItem from="1769158741464" duration="9464000" />
+      <workItem from="1772615179464" duration="7852000" />
+      <workItem from="1772954769092" duration="2536000" />
+      <workItem from="1773906519128" duration="4905000" />
+      <workItem from="1778831952345" duration="16827000" />
+      <workItem from="1780019438280" duration="770000" />
+      <workItem from="1780021058435" duration="981000" />
+      <workItem from="1780884618304" duration="482000" />
+      <workItem from="1780921450708" duration="9144000" />
+      <workItem from="1781441522332" duration="11099000" />
+      <workItem from="1781528616893" duration="13553000" />
+      <workItem from="1781657442354" duration="22172000" />
+      <workItem from="1782265675149" duration="1342000" />
+      <workItem from="1782267388375" duration="15895000" />
+      <workItem from="1782716009410" duration="3423000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$classify_samples.coverage" NAME="classify_samples 覆盖结果" MODIFIED="1753927234949" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$1.coverage" NAME="1 覆盖结果" MODIFIED="1760183199516" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$2.coverage" NAME="2 覆盖结果" MODIFIED="1753954350191" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$run_epar_defense.coverage" NAME="run_epar_defense 覆盖结果" MODIFIED="1773973086964" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$sort_poisoned_results.coverage" NAME="sort_poisoned_results 覆盖结果" MODIFIED="1750902706261" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$ddf.coverage" NAME="ddf 覆盖结果" MODIFIED="1758419603843" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$process_blended_results.coverage" NAME="process_blended_results 覆盖结果" MODIFIED="1751163978396" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$3.coverage" NAME="3 覆盖结果" MODIFIED="1773973148332" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$pgd_evaluation.coverage" NAME="pgd_evaluation 覆盖结果" MODIFIED="1749718988315" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$trans.coverage" NAME="trans 覆盖结果" MODIFIED="1750681229415" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$plot_combined_curve.coverage" NAME="plot_combined_curve 覆盖结果" MODIFIED="1751358035337" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/BackdoorBox_main$plot_sce_curves.coverage" NAME="plot_sce_curves 覆盖结果" MODIFIED="1750932487136" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>
