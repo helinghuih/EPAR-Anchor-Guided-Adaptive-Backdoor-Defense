@@ -135,20 +135,16 @@ class EPAR(Base):
             )
 
             if len(anchor_indices) == 0:
-                self.log("[Error] Could not find any clean samples for anchor! (Check logic)")
                 anchor_indices = [0, 1, 2]
 
             anchor_ds = utils.MatchSampleDataset(self.poisoned_trainset, anchor_indices)
         anchor_loader = DataLoader(anchor_ds, batch_size=32, shuffle=False, num_workers=4)
-
-        self.log("Calculating DDN HFE for Anchor...")
         anchor_ddn_res = utils.analyze_batch_with_ddn(
             self.model, anchor_loader, self.device, num_classes=self.num_classes, ddn_steps=100
         )
 
         anchor_hfe_values = [res['freq_diff_pre_post_energy'] for res in anchor_ddn_res]
         hfe_anchor_val = np.mean(anchor_hfe_values)
-        self.log(f">>> Clean Anchor HFE Diff: {hfe_anchor_val:.4f}")
 
         self.log("\n[Step 3] Splitting & Clustering...")
 
@@ -170,12 +166,9 @@ class EPAR(Base):
             if p_expo[i].item() == true_labels[i].item():
                 g2_indices.append(i)
 
-        self.log(f"G2 Size: {len(g2_indices)}")
-
         label_counts = torch.bincount(true_labels, minlength=self.num_classes)
         normal_class_counts = [int(label_counts[c]) for c in range(self.num_classes) if c != inferred_target]
         estimated_class_size = int(np.median(normal_class_counts))
-        self.log(f"Estimated Normal Class Size: {estimated_class_size}")
 
         features_buffer = {}
 
@@ -220,8 +213,6 @@ class EPAR(Base):
             indices_c1 = [g2_indices_map[i] for i in mask_1.nonzero(as_tuple=True)[0].tolist()]
 
         handle.remove()
-        self.log(f"Cluster 0: {len(indices_c0)} | Cluster 1: {len(indices_c1)}")
-
         self.log("\n[Step 4] Identifying Clusters (Anchor vs C0/C1)...")
 
         cache_dir = './cache'
@@ -232,10 +223,8 @@ class EPAR(Base):
 
         hfe_map = {}
         if os.path.exists(ddn_path):
-            self.log(f"Loading HFE Cache: {ddn_path}")
             hfe_map = torch.load(ddn_path)
         else:
-            self.log("Computing HFE for G2...")
             ds_calc = utils.MatchSampleDataset(self.poisoned_trainset, g2_indices)
             l_calc = DataLoader(ds_calc, batch_size=64, shuffle=False, num_workers=4)
 
@@ -253,8 +242,6 @@ class EPAR(Base):
 
         hfe_c0 = get_avg_hfe(indices_c0)
         hfe_c1 = get_avg_hfe(indices_c1)
-
-        self.log(f"Anchor: {hfe_anchor_val:.2f} | C0: {hfe_c0:.2f} | C1: {hfe_c1:.2f}")
         dist0 = abs(hfe_c0 - hfe_anchor_val)
         dist1 = abs(hfe_c1 - hfe_anchor_val)
 
@@ -263,19 +250,15 @@ class EPAR(Base):
             poison_cluster = indices_c1
             mean_poison = hfe_c1
             mean_clean = hfe_c0
-            self.log("Cluster 0 is closer to Anchor -> CLEAN.")
         else:
             candidate_indices = indices_c1
             poison_cluster = indices_c0
             mean_poison = hfe_c0
             mean_clean = hfe_c1
-            self.log("Cluster 1 is closer to Anchor -> CLEAN.")
 
         self.log("\n[Step 5] Refinement (Directional)...")
 
         poison_bias = mean_poison - mean_clean
-        self.log(f"Poison Bias (Poison - Clean): {poison_bias:.4f}")
-
         pgd_cache_name = f"{cache_tag}_pgd_g2_results.pth"
         pgd_path = os.path.join(cache_dir, pgd_cache_name)
         pgd_map = {}
@@ -284,7 +267,6 @@ class EPAR(Base):
 
         missing = [idx for idx in candidate_indices if idx not in pgd_map]
         if missing:
-            self.log(f"Computing PGD for {len(missing)} samples...")
             ds_pgd = utils.MatchSampleDataset(self.poisoned_trainset, missing)
             l_pgd = DataLoader(ds_pgd, batch_size=64, shuffle=False, num_workers=4)
             for img, lbl, idxs in tqdm(l_pgd, desc="PGD"):
@@ -321,33 +303,23 @@ class EPAR(Base):
             keep_count = max(1, keep_count)
             drop_count = len(metrics) - keep_count
 
-            self.log(
-                f"Base Keep: {base_keep_count} | "
-                f"Class-Prior Keep: {class_prior_keep} | "
-                f"Final Keep: {keep_count}"
-            )
-
             if poison_bias < 0:
                 kept_items = metrics[drop_count:]
-                self.log(f"Bias < 0 (Poison Low). Drop TOP (High Metric).")
             else:
                 kept_items = metrics[:keep_count]
-                self.log(f"Bias > 0 (Poison High). Drop BOTTOM (Low Metric).")
 
             g2_refined = [x[0] for x in kept_items]
         else:
             g2_refined = candidate_indices
 
-        self.log(f"Final Kept G2: {len(g2_refined)} / {len(candidate_indices)}")
 
         if hasattr(self.poisoned_trainset, 'poisoned_set'):
             p_set = self.poisoned_trainset.poisoned_set
             g2_kept_p = sum(1 for i in g2_refined if i in p_set)
-            self.log(f"[God's View] Poison Remaining in G2 Refined: {g2_kept_p}")
         all_train_indices = [i for i in range(len(self.poisoned_trainset)) if i not in g2_indices]  # G1
         final_indices = all_train_indices + g2_refined
 
-        self.log(f"\n[Step 6] Retraining with {len(final_indices)} samples...")
+        self.log(f"\n[Step 6] Retraining ")
 
         clean_ds = Subset(self.poisoned_retrainset, final_indices)
 
