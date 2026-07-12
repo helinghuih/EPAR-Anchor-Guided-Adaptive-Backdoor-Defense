@@ -86,7 +86,7 @@ retrain_schedule = {
     'momentum': 0.9,
     'weight_decay': 5e-4,
     'gamma': 0.1,
-    'schedule': [40, 70],
+    'schedule': [75, 90],
     'transform': retrain_transform,
     'test_epoch_interval': 2
 }
