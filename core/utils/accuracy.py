@@ -27,10 +27,6 @@ def filter_poisoned_testset(poisoned_dataset, clean_dataset, target_class):
     else:
         clean_targets = np.array([y for _, y in clean_dataset])
     non_target_indices = np.where(clean_targets != target_class)[0]
-    excluded_count = len(poisoned_dataset) - len(non_target_indices)
-    print(f"\n[ASR Filter] Target Class: {target_class}")
-    print(f"Original Size: {len(poisoned_dataset)} -> Filtered Size: {len(non_target_indices)}")
-    print(f"Excluded {excluded_count} clean target samples for strict ASR calculation.\n")
 
     subset = Subset(poisoned_dataset, non_target_indices)
 
