@@ -1,42 +1,49 @@
 import os
-import time
+import random
+import numpy as np
 import torch
 import torch.nn as nn
 import torchvision
-from torchvision.transforms import Compose, ToTensor, RandomCrop, RandomHorizontalFlip
-import numpy as np
-from PIL import Image
-from core.utils.log import Log
+from torchvision.transforms import Compose, RandomCrop, RandomHorizontalFlip, ToTensor
+
 import core
+import core.defenses.analysis_utils as utils
 from core.defenses.epar import EPAR
 from core.utils.accuracy import filter_poisoned_testset
 
+
 global_seed = 666
+random.seed(global_seed)
+np.random.seed(global_seed)
 torch.manual_seed(global_seed)
+
 CUDA_VISIBLE_DEVICES = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = CUDA_VISIBLE_DEVICES
+
 datasets_root_dir = './data'
-
-POISONED_CKPT_PATH = './experiments/CIFAR-10_BadNets/ckpt_epoch_100.pth'
 TARGET_CLASS = 0
+SHOTS_PER_CLASS = 30
+NUM_CLASSES = 10
 
-print("Initializing Data...")
-dataset = torchvision.datasets.CIFAR10
-
-transform_train = Compose([
-    RandomHorizontalFlip(),
-    ToTensor()
-])
-
-trainset = dataset(datasets_root_dir, train=True, transform=transform_train, download=True)
-
-transform_test = Compose([ToTensor()])
-testset = dataset(datasets_root_dir, train=False, transform=transform_test, download=True)
+ckpt_path = './experiments/CIFAR-10_BadNets/ckpt_epoch_100.pth'
 
 pattern = torch.zeros((1, 32, 32), dtype=torch.uint8)
 pattern[0, -3:, -3:] = 255
 
 weight = torch.zeros((1, 32, 32), dtype=torch.float32)
 weight[0, -3:, -3:] = 1.0
+
+transform_train = Compose([ToTensor()])
+trainset = torchvision.datasets.CIFAR10(datasets_root_dir, train=True, transform=transform_train, download=True)
+
+transform_test = Compose([ToTensor()])
+testset = torchvision.datasets.CIFAR10(datasets_root_dir, train=False, transform=transform_test, download=True)
+
+retrain_transform = Compose([
+    RandomCrop(32, padding=4),
+    RandomHorizontalFlip(),
+    ToTensor()
+])
 
 attack = core.BadNets(
     train_dataset=trainset,
@@ -47,6 +54,9 @@ attack = core.BadNets(
     poisoned_rate=0.1,
     pattern=pattern,
     weight=weight,
+    poisoned_transform_train_index=0,
+    poisoned_transform_test_index=0,
+    poisoned_target_transform_index=0,
     seed=global_seed,
     deterministic=True
 )
@@ -54,29 +64,25 @@ attack = core.BadNets(
 p_train, p_test = attack.get_poisoned_dataset()
 p_test = filter_poisoned_testset(p_test, testset, target_class=TARGET_CLASS)
 
+trusted_clean_set = utils.get_few_shot_clean_subset(
+    p_train, num_classes=NUM_CLASSES, shots=SHOTS_PER_CLASS, seed=global_seed
+)
+
 model_poisoned = core.models.ResNet(18)
-if os.path.exists(POISONED_CKPT_PATH):
-    print(f"Loading poisoned model from {POISONED_CKPT_PATH}...")
-    state_dict = torch.load(POISONED_CKPT_PATH, map_location='cpu')
-    new_state_dict = {k[7:] if k.startswith('module.') else k: v for k, v in state_dict.items()}
-    model_poisoned.load_state_dict(new_state_dict)
-    print("Model loaded successfully.")
-else:
-    print(f"[Warning] Checkpoint not found at {POISONED_CKPT_PATH}. Using random init (Performance might be suboptimal).")
+state_dict = torch.load(ckpt_path, map_location='cpu')
+new_state_dict = {k[7:] if k.startswith('module.') else k: v for k, v in state_dict.items()}
+model_poisoned.load_state_dict(new_state_dict)
 
 cul_schedule = {
     'batch_size': 128,
     'num_workers': 4,
     'epochs': 20,
-    'lr': 0.01,
-    'schedule': [15],
-    'shots': 30,
+    'lr': 0.0001,
+    'weight_decay': 5e-4,
+    'schedule': [20, 20],
+    'max_unlearn_loss': 7.0,
+    'shots': SHOTS_PER_CLASS,
 }
-retrain_transform = Compose([
-    RandomCrop(32, padding=4),
-    RandomHorizontalFlip(),
-    ToTensor()
-])
 
 retrain_schedule = {
     'batch_size': 128,
@@ -88,34 +94,34 @@ retrain_schedule = {
     'gamma': 0.1,
     'schedule': [75, 90],
     'transform': retrain_transform,
-    'test_epoch_interval': 2
+    'test_epoch_interval': 5
 }
-timestamp = time.strftime("%Y-%m-%d_%H:%M:%S")
-exp_name = f'ResNet18_CIFAR10_BadNets_EPAR_{timestamp}'
 
 schedule = {
     'device': 'GPU',
     'CUDA_VISIBLE_DEVICES': CUDA_VISIBLE_DEVICES,
     'save_dir': 'experiments/EPAR-defense',
-    'experiment_name': exp_name,
+    'experiment_name': 'ResNet18_CIFAR10_BadNets',
     'dataset_name': 'CIFAR10',
-    'attack_name': 'Badnets',
+    'attack_name': 'BadNets',
+    'cache_tag': f'CIFAR10_BadNets_seed{global_seed}',
+    'drop_ratio': 0.4,
     'cul_schedule': cul_schedule,
     'retrain_schedule': retrain_schedule,
 }
 
-print(f"\n========== Running EPAR Defense: {exp_name} ==========")
 defense = EPAR(
     model=model_poisoned,
     loss=nn.CrossEntropyLoss(),
     poisoned_trainset=p_train,
     poisoned_testset=p_test,
     clean_testset=testset,
+    poisoned_retrainset=p_train,
+    trusted_clean_set=trusted_clean_set,
     seed=global_seed,
-    num_classes=10,
-    target_class=0
+    num_classes=NUM_CLASSES,
+    target_class=TARGET_CLASS
 )
 
 model_factory = lambda: core.models.ResNet(18)
-
 defense.train(schedule, model_factory)

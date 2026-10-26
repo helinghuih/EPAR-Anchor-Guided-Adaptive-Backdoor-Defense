@@ -2,15 +2,12 @@
 This is the test code of poisoned training under BadNets.
 '''
 
-
-import os.path as osp
-
-import cv2
+import random
+import numpy as np
 import torch
 import torch.nn as nn
 import torchvision
-from torchvision.datasets import DatasetFolder
-from torchvision.transforms import Compose, ToTensor, RandomHorizontalFlip, ToPILImage, Resize,RandomCrop
+from torchvision.transforms import Compose, ToTensor, RandomHorizontalFlip, RandomCrop
 
 import core
 
@@ -20,7 +17,10 @@ dataset = torchvision.datasets.CIFAR10
 
 global_seed = 666
 deterministic = False
+random.seed(global_seed)
+np.random.seed(global_seed)
 torch.manual_seed(global_seed)
+
 CUDA_SELECTED_DEVICES = '0'
 datasets_root_dir = './data'
 
@@ -54,7 +54,6 @@ badnets = core.BadNets(
     deterministic=deterministic
 )
 
-
 schedule = {
     'device': 'GPU',
     'CUDA_SELECTED_DEVICES': CUDA_SELECTED_DEVICES,
@@ -79,5 +78,3 @@ schedule = {
     'experiment_name': 'CIFAR-10_BadNets'
 }
 badnets.train(schedule)
-badnets.test(schedule)
-
