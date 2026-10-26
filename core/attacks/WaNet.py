@@ -1,4 +1,3 @@
-
 import copy
 from copy import deepcopy
 import random
@@ -39,8 +38,6 @@ class AddDatasetFolderTrigger(AddTrigger):
         self.h = identity_grid.shape[1]
         self.grid = self.identity_grid + self.noise_grid / self.h
         self.grid = torch.clamp(self.grid, -1, 1)
-
-
     def __call__(self, img):
         is_pil = False
         if isinstance(img, PIL.Image.Image):
@@ -64,6 +61,8 @@ class ModifyTarget:
 
 
 class PoisonedDatasetFolder(DatasetFolder):
+    """Poisoned DatasetFolder/ImageFolder for WaNet."""
+
     def __init__(
         self,
         benign_dataset,
@@ -215,6 +214,8 @@ class PoisonedMNIST(MNIST):
             if self.target_transform is not None: target = self.target_transform(target)
         return img, target
 
+
+# ✅ [新增] PoisonedGTSRB (原生支持)
 class PoisonedGTSRB(GTSRB):
     def __init__(self, benign_dataset, y_target, poisoned_rate, identity_grid, noise_grid, noise, poisoned_transform_index, poisoned_target_transform_index):
         super(PoisonedGTSRB, self).__init__(
@@ -260,6 +261,7 @@ def CreatePoisonedDataset(
     poisoned_target_transform_index,
     poisoned_set=None,
 ):
+    """Create WaNet poisoned dataset with ImageFolder support."""
 
     if isinstance(benign_dataset, GTSRB):
         return PoisonedGTSRB(
