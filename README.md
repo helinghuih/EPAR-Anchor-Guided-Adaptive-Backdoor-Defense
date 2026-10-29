@@ -1,8 +1,7 @@
 # EPAR: Anchor-Guided Adaptive Backdoor Defense via Adversarial Frequency Analysis
 
 
-![Python 3.8](https://img.shields.io/badge/python-3.8-DodgerBlue.svg?style=plastic) ![Pytorch 1.8.0](https://img.shields.io/badge/pytorch-1.8.0-DodgerBlue.svg?style=plastic) ![torchvision 0.9.0](https://img.shields.io/badge/torchvision-0.9.0-DodgerBlue.svg?style=plastic) ![CUDA 11.1](https://img.shields.io/badge/cuda-11.1-DodgerBlue.svg?style=plastic) ![License GPL](https://img.shields.io/badge/license-GPL-DodgerBlue.svg?style=plastic)
-
+<img src="https://img.shields.io/badge/python-3.8-DodgerBlue.svg?style=plastic" alt="Python 3.8"> <img src="https://img.shields.io/badge/pytorch-1.13.0-DodgerBlue.svg?style=plastic" alt="PyTorch 1.13.0"> <img src="https://img.shields.io/badge/torchvision-0.14.0-DodgerBlue.svg?style=plastic" alt="torchvision 0.14.0"> <img src="https://img.shields.io/badge/cuda-11.7-DodgerBlue.svg?style=plastic" alt="CUDA 11.7"> <img src="https://img.shields.io/badge/license-GPL-DodgerBlue.svg?style=plastic" alt="License GPL">
 
 
 
