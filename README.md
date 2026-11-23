@@ -24,7 +24,10 @@ Official PyTorch implementation, hyperparameter configurations, statistical anal
     ├── table6_isolation_quality.py # Table 6 CIFAR-10 TPR/FPR at gamma = 0.2 and 0.4
     ├── table7_module_necessity.py  # Table 7 w/o Refinement, w/o Partition, and Full EPAR
     ├── table8_decoupled_ablation.py# Table 8 equal-budget Feature vs. Frequency & init ablation
+    ├── table9_frequency_cues.py    # Table 9 controlled comparison of frequency cues on CIFAR-10
     └── table10_gamma_sensitivity.py# Table 10 pruning ratio gamma sweep (0.2–0.5)
+└── results/
+    └── per_seed_results.json       # Per-seed EPAR results (Seeds 666, 777, 888) and Table 2 baselines
 ```
 
 ## 1. Environment & Data Preparation
@@ -84,6 +87,10 @@ python reproduce_tables/table7_module_necessity.py --attack BadNets --ckpt_path 
 ### Table 8: Equal-Budget ($\gamma = 0.4$) Decoupled Feature vs. Frequency Ablation
 ```shell
 python reproduce_tables/table8_decoupled_ablation.py --dataset TinyImageNet --attack BadNets --ckpt_path ./experiments/Tiny-ImageNet_BadNets/ckpt_epoch_100.pth --seed 666
+```
+### Table 9: Controlled Comparison of Frequency Cues on CIFAR-10
+```shell
+python reproduce_tables/table9_frequency_cues.py --attack BadNets --ckpt_path ./experiments/CIFAR-10_BadNets/ckpt_epoch_100.pth --seed 666
 ```
 
 ### Table 10: Pruning Ratio $\gamma$ Sensitivity
