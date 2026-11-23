@@ -52,7 +52,10 @@ POISONED_RATE = 0.1
 
 transform = Compose([ToTensor()])
 trainset = torchvision.datasets.ImageFolder(osp.join(datasets_root_dir, 'train'), transform=transform)
-testset = torchvision.datasets.ImageFolder(osp.join(datasets_root_dir, 'val'), transform=transform)
+val_dir = osp.join(datasets_root_dir, 'val_classified')
+if not osp.isdir(val_dir):
+    raise FileNotFoundError(f"Validation directory not found: {val_dir}. Run prepare_tiny_imagenet.py first.")
+testset = torchvision.datasets.ImageFolder(val_dir, transform=transform)
 
 model = core.models.ResNet(18, num_classes=NUM_CLASSES)
 loss_fn = nn.CrossEntropyLoss()
