@@ -31,9 +31,9 @@ def gen_wanet_grids(img_size=64, k=4, s=0.5, seed=666):
 
 
 parser = argparse.ArgumentParser(description="Tiny-ImageNet Backdoor Attacks")
-parser.add_argument('--attack', type=str, default='BadNets',
+parser.add_argument('--attack', type=str, default='WaNet',
                     choices=['BadNets', 'Blended', 'Refool', 'WaNet'])
-parser.add_argument('--seed', type=int, default=666)
+parser.add_argument('--seed', type=int, default=777)
 parser.add_argument('--gpu', type=str, default='0')
 args = parser.parse_args()
 

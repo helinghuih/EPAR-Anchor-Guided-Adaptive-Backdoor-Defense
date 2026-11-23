@@ -53,46 +53,16 @@ def kmeans_pytorch(X, num_clusters=2, max_iter=100, tol=1e-4, device='cuda', ini
     return labels, centroids
 
 
-def kmeans_1d_signed(scores_np, max_iter=100, tol=1e-6):
-    scores = np.asarray(scores_np, dtype=np.float64)
-    if scores.size < 2:
-        return np.zeros(scores.size, dtype=np.int64)
-
-    c0 = float(np.percentile(scores, 25))
-    c1 = float(np.percentile(scores, 75))
-    if abs(c1 - c0) < tol:
-        c0, c1 = float(scores.min()), float(scores.max())
-
-    labels = np.zeros(scores.size, dtype=np.int64)
-    for _ in range(max_iter):
-        d0 = np.abs(scores - c0)
-        d1 = np.abs(scores - c1)
-        new_labels = (d1 < d0).astype(np.int64)
-
-        new_c0 = float(scores[new_labels == 0].mean()) if (new_labels == 0).any() else c0
-        new_c1 = float(scores[new_labels == 1].mean()) if (new_labels == 1).any() else c1
-        labels = new_labels
-        if abs(new_c0 - c0) + abs(new_c1 - c1) < tol:
-            break
-        c0, c1 = new_c0, new_c1
-
-    return labels
-
-
-def anchor_subspace_clustering(g2_feats_norm, anchor_feats_norm, anchor_feat_center):
-    diff = g2_feats_norm - anchor_feat_center
-    anchor_std = anchor_feats_norm.std(dim=0, keepdim=True) + 1e-4
-    z_diff = torch.abs(diff) / anchor_std
-    topk_vals, _ = torch.topk(z_diff, k=min(32, z_diff.size(1)), dim=1)
-    anomaly_score = topk_vals.mean(dim=1).numpy()
-
-    labels = kmeans_1d_signed(anomaly_score)
-    c0_mean = anomaly_score[labels == 0].mean() if (labels == 0).any() else 0.0
-    c1_mean = anomaly_score[labels == 1].mean() if (labels == 1).any() else 0.0
-    if c0_mean <= c1_mean:
-        return (labels == 0), (labels == 1), float(c0_mean), float(c1_mean)
-    else:
-        return (labels == 1), (labels == 0), float(c1_mean), float(c0_mean)
+def _compute_isolation_metrics(kept_indices, total_n, poisoned_set):
+    kept_set = set(kept_indices)
+    discarded_set = set(range(total_n)) - kept_set
+    tp = len(discarded_set & poisoned_set)
+    fp = len(discarded_set - poisoned_set)
+    total_p = len(poisoned_set)
+    total_c = total_n - total_p
+    tpr = (tp / total_p * 100.0) if total_p > 0 else 0.0
+    fpr = (fp / total_c * 100.0) if total_c > 0 else 0.0
+    return tp, fp, tpr, fpr
 
 
 class EPAR(Base):
@@ -175,27 +145,42 @@ class EPAR(Base):
         else:
             inferred_target = int(dom_class)
 
-        self.log(f"Inferred Target Class: {inferred_target}")
+        self.log(f"Inferred Target Class: {inferred_target} (Ground-Truth Target: {self.target_class})")
 
         anchor_indices = [
             i for i in range(len(self.trusted_clean_set))
             if int(self.trusted_clean_set[i][1]) == inferred_target
         ]
-        anchor_ds = Subset(self.trusted_clean_set, anchor_indices)
-
-        anchor_loader = DataLoader(anchor_ds, batch_size=32, shuffle=False, num_workers=4)
-        anchor_ddn_res = utils.analyze_batch_with_ddn(
-            self.model, anchor_loader, self.device, num_classes=self.num_classes, ddn_steps=100
+        anchor_train_indices = (
+            [int(self.trusted_clean_set.indices[i]) for i in anchor_indices]
+            if hasattr(self.trusted_clean_set, 'indices') else []
         )
-        anchor_hfe_values = [res['freq_diff_pre_post_energy'] for res in anchor_ddn_res]
-        hfe_anchor_val = float(np.mean(anchor_hfe_values)) if anchor_hfe_values else 0.0
+        anchor_ds = Subset(self.trusted_clean_set, anchor_indices)
+        anchor_loader = DataLoader(anchor_ds, batch_size=32, shuffle=False, num_workers=4)
 
         self.log("[Phase 2] Anchor-Guided Identification...")
 
+        total_n = len(self.poisoned_trainset)
+        poisoned_set = (
+            set(int(i) for i in self.poisoned_trainset.poisoned_set)
+            if hasattr(self.poisoned_trainset, 'poisoned_set') and self.poisoned_trainset.poisoned_set is not None
+            else set()
+        )
+
         g2_indices = [
-            i for i in range(len(self.poisoned_trainset))
+            i for i in range(total_n)
             if given_labels[i].item() == inferred_target
         ]
+        all_train_indices = [i for i in range(total_n) if i not in set(g2_indices)]
+        trusted_indices = [int(i) for i in self.trusted_clean_set.indices] if hasattr(self.trusted_clean_set, 'indices') else []
+
+        if poisoned_set:
+            p_in_g2 = len(set(g2_indices) & poisoned_set)
+            c_in_g2 = len(g2_indices) - p_in_g2
+            self.log(
+                f"[Subset Summary] |D|={total_n}, |D_p|={len(poisoned_set)}, |D_t|={len(g2_indices)} "
+                f"(Poisons in D_t={p_in_g2}, Clean in D_t={c_in_g2})"
+            )
 
         features_buffer = {}
         target_layer = next(m for _, m in reversed(list(self.model.named_modules())) if isinstance(m, nn.Linear))
@@ -228,24 +213,13 @@ class EPAR(Base):
 
             g2_feats_norm = F.normalize(torch.cat(g2_feats_list, dim=0), p=2, dim=1)
 
+            torch.manual_seed(self.seed)
             labels, _ = kmeans_pytorch(
                 g2_feats_norm, num_clusters=2, device=self.device, init_anchor=anchor_feat_center
             )
             mask_0, mask_1 = (labels == 0).cpu(), (labels == 1).cpu()
             c0_center = F.normalize(g2_feats_norm[mask_0].mean(dim=0, keepdim=True), p=2, dim=1)
             c1_center = F.normalize(g2_feats_norm[mask_1].mean(dim=0, keepdim=True), p=2, dim=1)
-
-            feat_dist0_init = float(1.0 - F.cosine_similarity(anchor_feat_center, c0_center).item())
-            feat_dist1_init = float(1.0 - F.cosine_similarity(anchor_feat_center, c1_center).item())
-
-            if abs(feat_dist0_init - feat_dist1_init) < 0.005:
-                mask_0_np, mask_1_np, _, _ = anchor_subspace_clustering(
-                    g2_feats_norm, anchor_feats_norm, anchor_feat_center
-                )
-                mask_0 = torch.from_numpy(mask_0_np)
-                mask_1 = torch.from_numpy(mask_1_np)
-                c0_center = F.normalize(g2_feats_norm[mask_0].mean(dim=0, keepdim=True), p=2, dim=1)
-                c1_center = F.normalize(g2_feats_norm[mask_1].mean(dim=0, keepdim=True), p=2, dim=1)
 
             indices_c0 = [g2_indices_map[i] for i in mask_0.nonzero(as_tuple=True)[0].tolist()]
             indices_c1 = [g2_indices_map[i] for i in mask_1.nonzero(as_tuple=True)[0].tolist()]
@@ -269,12 +243,28 @@ class EPAR(Base):
                 hfe_map[missing_ddn[i]] = res['freq_diff_pre_post_energy']
             torch.save(hfe_map, ddn_path)
 
-        def get_avg_hfe(indices):
-            vals = [hfe_map[i] if not isinstance(hfe_map[i], dict) else hfe_map[i]['freq_diff_pre_post_energy']
-                    for i in indices if i in hfe_map]
-            return float(np.mean(vals)) if vals else 0.0
+        def get_hfe_val(idx):
+            v = hfe_map[idx]
+            return v['freq_diff_pre_post_energy'] if isinstance(v, dict) else float(v)
 
-        hfe_c0, hfe_c1 = get_avg_hfe(indices_c0), get_avg_hfe(indices_c1)
+        def get_cluster_hfe(indices):
+            vals = [get_hfe_val(i) for i in indices if i in hfe_map]
+            if not vals:
+                return 0.0
+            return float(np.median(vals)) if shots <= 10 else float(np.mean(vals))
+
+        if anchor_train_indices and all(idx in hfe_map for idx in anchor_train_indices):
+            anchor_hfe_values = [get_hfe_val(idx) for idx in anchor_train_indices]
+        else:
+            anchor_ddn_res = utils.analyze_batch_with_ddn(
+                self.model, anchor_loader, self.device, num_classes=self.num_classes, ddn_steps=100
+            )
+            anchor_hfe_values = [res['freq_diff_pre_post_energy'] for res in anchor_ddn_res]
+        hfe_anchor_val = (
+            float(np.median(anchor_hfe_values)) if shots <= 10 else float(np.mean(anchor_hfe_values))
+        ) if anchor_hfe_values else 0.0
+
+        hfe_c0, hfe_c1 = get_cluster_hfe(indices_c0), get_cluster_hfe(indices_c1)
         dist0, dist1 = abs(hfe_c0 - hfe_anchor_val), abs(hfe_c1 - hfe_anchor_val)
 
         feat_dist0 = float(1.0 - F.cosine_similarity(anchor_feat_center, c0_center).item())
@@ -289,6 +279,14 @@ class EPAR(Base):
         else:
             candidate_indices, poison_cluster = indices_c1, indices_c0
             mean_clean, mean_poison = hfe_c1, hfe_c0
+
+        if poisoned_set:
+            kept_stage2 = list(dict.fromkeys(all_train_indices + candidate_indices + trusted_indices))
+            tp_s2, fp_s2, tpr_s2, fpr_s2 = _compute_isolation_metrics(kept_stage2, total_n, poisoned_set)
+            self.log(
+                f"[Stage 2: w/o Refinement] |C_benign|={len(candidate_indices)}, |C_poisoned|={len(poison_cluster)} | "
+                f"TP={tp_s2}, FP={fp_s2} | Stage 2 TPR={tpr_s2:.2f}%, FPR={fpr_s2:.2f}%"
+            )
 
         self.log("[Phase 3] Adaptive Refinement...")
 
@@ -306,11 +304,9 @@ class EPAR(Base):
                     pgd_map[oid.item()] = steps_list[i]
             torch.save(pgd_map, pgd_path)
 
+        drop_ratio = schedule.get('drop_ratio', 0.40)
         if len(candidate_indices) > 0:
-            hfe_arr = np.asarray([
-                hfe_map[idx] if not isinstance(hfe_map[idx], dict) else hfe_map[idx]['freq_diff_pre_post_energy']
-                for idx in candidate_indices
-            ], dtype=np.float64)
+            hfe_arr = np.asarray([get_hfe_val(idx) for idx in candidate_indices], dtype=np.float64)
             p_arr = np.asarray([pgd_map.get(idx, 0) for idx in candidate_indices], dtype=np.float64)
             epsilon = 1e-6
 
@@ -334,15 +330,32 @@ class EPAR(Base):
             ]
             metrics.sort(key=lambda x: x[1], reverse=True)
 
-            drop_ratio = schedule.get('drop_ratio', 0.40)
             keep_count = max(1, int(len(metrics) * (1.0 - drop_ratio)))
             g2_refined = [x[0] for x in metrics[:keep_count]]
+
+            if poisoned_set:
+                keep_02 = max(1, int(len(metrics) * 0.80))
+                kept_02 = list(dict.fromkeys(all_train_indices + [x[0] for x in metrics[:keep_02]] + trusted_indices))
+                tp_02, fp_02, tpr_02, fpr_02 = _compute_isolation_metrics(kept_02, total_n, poisoned_set)
+                self.log(
+                    f"[Isolation @ gamma=0.2] N_removed={tp_02 + fp_02} (TP={tp_02}, FP={fp_02}) | "
+                    f"TPR={tpr_02:.2f}%, FPR={fpr_02:.2f}%"
+                )
         else:
             g2_refined = candidate_indices
 
-        all_train_indices = [i for i in range(len(self.poisoned_trainset)) if i not in g2_indices]
-        trusted_indices = list(self.trusted_clean_set.indices) if hasattr(self.trusted_clean_set, 'indices') else []
         final_indices = list(dict.fromkeys(all_train_indices + g2_refined + trusted_indices))
+
+        if poisoned_set:
+            res_poisons_before = len(set(candidate_indices) & poisoned_set)
+            res_poisons_after = len(set(g2_refined) & poisoned_set)
+            prr = ((res_poisons_before - res_poisons_after) / res_poisons_before * 100.0) if res_poisons_before > 0 else 100.0
+            rpr = (res_poisons_after / len(g2_refined) * 100.0) if len(g2_refined) > 0 else 0.0
+            tp_f, fp_f, tpr_f, fpr_f = _compute_isolation_metrics(final_indices, total_n, poisoned_set)
+            self.log(
+                f"[Stage 3 & Full EPAR @ gamma={drop_ratio}] Stage 3 PRR={prr:.2f}%, RPR={rpr:.2f}% | "
+                f"N_removed={tp_f + fp_f} (TP={tp_f}, FP={fp_f}) | Full TPR={tpr_f:.2f}%, Full FPR={fpr_f:.2f}%"
+            )
 
         self.log("[Phase 4] Retraining Purified Model...")
 

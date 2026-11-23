@@ -33,7 +33,7 @@ def gen_wanet_grids(img_size=32, k=4, s=0.5, seed=666):
 parser = argparse.ArgumentParser(description="GTSRB Backdoor Attacks")
 parser.add_argument('--attack', type=str, default='BadNets',
                     choices=['BadNets', 'Blended', 'Refool', 'WaNet', 'SIG'])
-parser.add_argument('--seed', type=int, default=666)
+parser.add_argument('--seed', type=int, default=777)
 parser.add_argument('--gpu', type=str, default='0')
 args = parser.parse_args()
 
@@ -177,7 +177,7 @@ schedule = {
     'momentum': 0.9,
     'weight_decay': 5e-4,
     'gamma': 0.1,
-    'schedule': [75, 90],
+    'schedule': [30,60],
 
     'epochs': 100,
 

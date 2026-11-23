@@ -104,14 +104,10 @@ class PoisonedDatasetFolder_SIG(DatasetFolder):
         poisoned_num = int(total_num * poisoned_rate)
 
         if is_train:
-            labels = np.array([s[1] for s in self.samples])
+            labels = np.array([s[1] for s in self._samples])
             target_indices = np.where(labels == y_target)[0]
-            max_clean_label_poisons = int(len(target_indices) * 0.5)
-            if poisoned_num > max_clean_label_poisons:
-                print(
-                    f"[SIG] Info: Capping clean-label poisons from {poisoned_num} to 50% of target class ({max_clean_label_poisons}/{len(target_indices)}).")
-                poisoned_num = max_clean_label_poisons
-
+            if poisoned_num > len(target_indices):
+                poisoned_num = len(target_indices)
             selected_indices = np.random.choice(target_indices, poisoned_num, replace=False).tolist()
         else:
             indices = list(range(total_num))
@@ -304,11 +300,8 @@ class PoisonedGTSRB_SIG(GTSRB):
         if is_train:
             labels = np.array([s[1] for s in self._samples])
             target_indices = np.where(labels == y_target)[0]
-            max_clean_label_poisons = int(len(target_indices) * 0.5)
-            if poisoned_num > max_clean_label_poisons:
-                print(
-                    f"[SIG] Info: Capping GTSRB clean-label poisons from {poisoned_num} to 50% of target class ({max_clean_label_poisons}/{len(target_indices)}).")
-                poisoned_num = max_clean_label_poisons
+            if poisoned_num > len(target_indices):
+                poisoned_num = len(target_indices)
             selected_indices = np.random.choice(target_indices, poisoned_num, replace=False).tolist()
         else:
             tmp_list = list(range(total_num))

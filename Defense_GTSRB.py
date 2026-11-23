@@ -22,8 +22,8 @@ from core.utils.accuracy import filter_poisoned_testset
 parser = argparse.ArgumentParser(description="GTSRB EPAR Defense")
 parser.add_argument('--attack', type=str, default='BadNets',
                     choices=['BadNets', 'Blended', 'Refool', 'WaNet', 'SIG'])
-parser.add_argument('--ckpt_path', type=str, default='./experiments/GTSRB_BadNets/ckpt_epoch_100.pth')
-parser.add_argument('--seed', type=int, default=666)
+parser.add_argument('--ckpt_path', type=str, default='./experiments/GTSRB_BadNets_2026-11-19_17:35:46/ckpt_epoch_100.pth')
+parser.add_argument('--seed', type=int, default=777)
 parser.add_argument('--gpu', type=str, default='0')
 args = parser.parse_args()
 
@@ -84,7 +84,7 @@ elif attack_name == 'Blended':
     )
 
 elif attack_name == 'Refool':
-    reflection_dir = './resource/refool/Refool-SelectedReflectionImages/selected_out-of-focus'
+    reflection_dir = './resource/refool/Refool-SelectedReflectionImages/selected_out-images'
     attack = core.Refool(
         train_dataset=trainset, test_dataset=testset, model=base_model, loss=loss_fn,
         y_target=TARGET_CLASS, poisoned_rate=0.1, reflection_dir=reflection_dir,
@@ -92,12 +92,17 @@ elif attack_name == 'Refool':
     )
 
 elif attack_name == 'WaNet':
-    identity_grid = torch.load(osp.join(ckpt_dir, 'identity_grid.pth'), map_location='cpu')
-    noise_grid = torch.load(osp.join(ckpt_dir, 'noise_grid.pth'), map_location='cpu')
+    ig_p = osp.join(ckpt_dir, 'identity_grid.pth')
+    ng_p = osp.join(ckpt_dir, 'noise_grid.pth')
+    if not osp.exists(ig_p):
+        ig_p = osp.join(ckpt_dir, 'identity_grid.pt')
+        ng_p = osp.join(ckpt_dir, 'noise_grid.pt')
+    identity_grid = torch.load(ig_p, map_location='cpu')
+    noise_grid = torch.load(ng_p, map_location='cpu')
     attack = core.WaNet(
         train_dataset=trainset, test_dataset=testset, model=base_model, loss=loss_fn,
         y_target=TARGET_CLASS, poisoned_rate=0.1, identity_grid=identity_grid,
-        noise_grid=noise_grid, noise=False,
+        noise_grid=noise_grid, noise=True,
         poisoned_transform_train_index=1, poisoned_transform_test_index=1,
         poisoned_target_transform_index=0, seed=global_seed, deterministic=False
     )
@@ -105,7 +110,7 @@ elif attack_name == 'WaNet':
 elif attack_name == 'SIG':
     attack = core.SIG(
         train_dataset=trainset, test_dataset=testset, model=base_model, loss=loss_fn,
-        y_target=TARGET_CLASS, poisoned_rate=0.05, delta=40 / 255.0, f=6,
+        y_target=TARGET_CLASS, poisoned_rate=0.05, delta=60 / 255.0, f=6,
         poisoned_transform_train_index=1, poisoned_transform_test_index=1,
         poisoned_target_transform_index=0, seed=global_seed, deterministic=False
     )
